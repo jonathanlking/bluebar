@@ -21,6 +21,7 @@
 		AB8E16AC17D639160071486E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB8E168E17D639160071486E /* UIKit.framework */; };
 		AB8E16B417D639160071486E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB8E16B217D639160071486E /* InfoPlist.strings */; };
 		AB8E16B617D639160071486E /* BluebarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8E16B517D639160071486E /* BluebarTests.m */; };
+		AB8E16C317D63A320071486E /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8E16C117D63A320071486E /* BLE.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,9 @@
 		AB8E16B117D639160071486E /* BluebarTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BluebarTests-Info.plist"; sourceTree = "<group>"; };
 		AB8E16B317D639160071486E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AB8E16B517D639160071486E /* BluebarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BluebarTests.m; sourceTree = "<group>"; };
+		AB8E16C017D63A320071486E /* BLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLE.h; sourceTree = "<group>"; };
+		AB8E16C117D63A320071486E /* BLE.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLE.m; sourceTree = "<group>"; };
+		AB8E16C217D63A320071486E /* BLEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLEDefines.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +105,7 @@
 		AB8E168917D639160071486E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AB8E16BF17D63A320071486E /* BLE_Framework */,
 				AB8E168A17D639160071486E /* Foundation.framework */,
 				AB8E168C17D639160071486E /* CoreGraphics.framework */,
 				AB8E168E17D639160071486E /* UIKit.framework */,
@@ -150,6 +155,16 @@
 				AB8E16B217D639160071486E /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		AB8E16BF17D63A320071486E /* BLE_Framework */ = {
+			isa = PBXGroup;
+			children = (
+				AB8E16C017D63A320071486E /* BLE.h */,
+				AB8E16C117D63A320071486E /* BLE.m */,
+				AB8E16C217D63A320071486E /* BLEDefines.h */,
+			);
+			path = BLE_Framework;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -255,6 +270,7 @@
 				AB8E16A117D639160071486E /* ViewController.m in Sources */,
 				AB8E169B17D639160071486E /* AppDelegate.m in Sources */,
 				AB8E169717D639160071486E /* main.m in Sources */,
+				AB8E16C317D63A320071486E /* BLE.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
