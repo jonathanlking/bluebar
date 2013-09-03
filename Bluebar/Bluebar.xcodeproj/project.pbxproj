@@ -60,6 +60,7 @@
 		AB8E16C217D63A320071486E /* BLEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLEDefines.h; sourceTree = "<group>"; };
 		AB8E16C417D645E50071486E /* NSObject+PWObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PWObject.h"; sourceTree = "<group>"; };
 		AB8E16C517D645E50071486E /* NSObject+NSObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+NSObject.m"; sourceTree = "<group>"; };
+		AB8E16C817D68BF00071486E /* Arduino.ino */ = {isa = PBXFileReference; lastKnownFileType = text; path = Arduino.ino; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +90,7 @@
 		AB8E167E17D639160071486E = {
 			isa = PBXGroup;
 			children = (
+				AB8E16C717D68BF00071486E /* Arduino */,
 				AB8E169017D639160071486E /* Bluebar */,
 				AB8E16AF17D639160071486E /* BluebarTests */,
 				AB8E168917D639160071486E /* Frameworks */,
@@ -170,6 +172,15 @@
 				AB8E16C217D63A320071486E /* BLEDefines.h */,
 			);
 			path = BLE_Framework;
+			sourceTree = "<group>";
+		};
+		AB8E16C717D68BF00071486E /* Arduino */ = {
+			isa = PBXGroup;
+			children = (
+				AB8E16C817D68BF00071486E /* Arduino.ino */,
+			);
+			name = Arduino;
+			path = ../Arduino;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
