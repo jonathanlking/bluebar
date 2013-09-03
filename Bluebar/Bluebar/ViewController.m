@@ -21,6 +21,7 @@
 - (void)scanForPeripherals;
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin;
 - (UInt8)addressForPin:(int)pin;
+- (BOOL)pinSupportsAnalogOutput;
 @end
 
 @implementation ViewController
@@ -90,6 +91,21 @@
     }
 }
 
+- (BOOL)pinSupportsAnalogOutput:(int)pin {
+    
+    switch (pin) {
+        case DIGITAL_OUTPUT_PIN:
+            return NO;
+            break;
+        case PWM_PIN:
+            return YES;
+            break;
+        default:
+            return NO;
+            break;
+    }
+}
+
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin {
     
     UInt8 buffer[3] = {0x00, 0x00, 0x00};
@@ -101,6 +117,13 @@
 }
 
 - (void)setAnalogOutput:(UInt8)output forPin:(int)pin {
+    
+    if (![self pinSupportsAnalogOutput:pin]) {
+        
+        NSLog(@"This pin does not support analog output!");
+        [self setDigitalOutput:(BOOL)output forPin:pin];
+        return;
+    }
     
     UInt8 buffer[3] = {0x00, 0x00, 0x00};
     buffer[0] = [self addressForPin:pin];
