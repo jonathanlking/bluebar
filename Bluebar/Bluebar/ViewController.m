@@ -21,7 +21,11 @@
 - (void)scanForPeripherals;
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin;
 - (UInt8)addressForPin:(int)pin;
-- (BOOL)pinSupportsAnalogOutput;
+- (BOOL)pinSupportsAnalogOutput:(int)pin;
+- (void)disconnectCurrentDevice;
+- (void)controlSwitchValueChanged:(id)sender;
+// Test methods
+- (void)blink:(NSNumber *)value;
 @end
 
 @implementation ViewController
@@ -36,7 +40,7 @@
     [self.manager controlSetup:1];
     self.manager.delegate = self;
     
-    [self performSelector:@selector(scanForPeripherals) withObject:nil afterDelay:0];
+    [_controlSwitch addTarget:self action:@selector(controlSwitchValueChanged:) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)didReceiveMemoryWarning
@@ -55,13 +59,10 @@
         return;
     }
     
-    if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
-        
-        // Already connected - so disconnect
-        [[self.manager CM] cancelPeripheralConnection:[self.manager activePeripheral]];
-    }
-    
     self.manager.peripherals = nil;
+    
+    // Stop the user changing the switch
+    _controlSwitch.enabled = NO;
     
     // Search for peripherals with a timeout of 2 seconds
     int timeout = 2;
@@ -71,9 +72,19 @@
     [self performBlock:^{
         
         if (self.manager.peripherals.count > 0) [self.manager connectPeripheral:self.manager.peripherals[0]];
+        _controlSwitch.enabled = YES;
         
     } afterDelay:timeout];
 
+}
+
+- (void)disconnectCurrentDevice {
+    
+    if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
+        
+        // Already connected - so disconnect
+        [[self.manager CM] cancelPeripheralConnection:[self.manager activePeripheral]];
+    }
 }
 
 - (UInt8)addressForPin:(int)pin {
@@ -134,11 +145,54 @@
     [self.manager write:data];
 }
 
+- (void)controlSwitchValueChanged:(id)sender {
+    
+    if (_controlSwitch.on) {
+
+        // The switch has been turned on, therefore start scanning.
+        [self scanForPeripherals];
+        _signalStrength.text = @"Connecting";
+    }
+    
+    else {
+        
+        [self disconnectCurrentDevice];
+    }
+}
+
+#pragma mark - Tests
+
+- (void)blink:(NSNumber *)value {
+    
+    [self setDigitalOutput:value.integerValue forPin:DIGITAL_OUTPUT_PIN];
+    BOOL inverse = !(BOOL)value.integerValue;
+    [self performSelector:@selector(blink:) withObject:[NSNumber numberWithBool:inverse] afterDelay:1];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
+        
+        [self setDigitalOutput:LOW forPin:DIGITAL_OUTPUT_PIN];
+    }
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
+        
+        // Already connected - so disconnect
+        [self setDigitalOutput:HIGH forPin:DIGITAL_OUTPUT_PIN];
+    }
+}
+
 #pragma mark - BLE delegate
 
 - (void)bleDidDisconnect
 {
     NSLog(@"->Disconnected");
+    [_controlSwitch setOn:NO animated:YES];
+    _signalStrength.text = @"Disconnected";
 }
 
 // When RSSI is changed, this will be called
@@ -147,14 +201,17 @@
     UInt8 brightness = abs(rssi.intValue)*2;
     [self setAnalogOutput:brightness forPin:PWM_PIN];
     
-    NSLog(@"Signal strength: %@ Brightness: %d", rssi.stringValue, brightness);
+    _signalStrength.text = [NSString stringWithFormat:@"Signal strength: %@", rssi.stringValue];
 }
 
 // When disconnected, this will be called
 - (void)bleDidConnect
 {
     NSLog(@"->Connected");
-    [self setDigitalOutput:HIGH forPin:DIGITAL_OUTPUT_PIN];
+    [_controlSwitch setOn:YES animated:YES];
+    _signalStrength.text = @"Connected";
+//    [self setDigitalOutput:HIGH forPin:DIGITAL_OUTPUT_PIN];
+//    [self blink:[NSNumber numberWithBool:HIGH]];
 }
 
 // When data is comming, this will be called

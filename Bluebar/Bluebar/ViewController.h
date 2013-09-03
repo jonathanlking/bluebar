@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
-
+@property (strong, nonatomic) IBOutlet UISwitch *controlSwitch;
+@property (strong, nonatomic) IBOutlet UILabel *signalStrength;
 @end
