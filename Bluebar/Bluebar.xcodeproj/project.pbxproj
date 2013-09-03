@@ -22,6 +22,7 @@
 		AB8E16B417D639160071486E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB8E16B217D639160071486E /* InfoPlist.strings */; };
 		AB8E16B617D639160071486E /* BluebarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8E16B517D639160071486E /* BluebarTests.m */; };
 		AB8E16C317D63A320071486E /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8E16C117D63A320071486E /* BLE.m */; };
+		AB8E16C617D645E50071486E /* NSObject+NSObject.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8E16C517D645E50071486E /* NSObject+NSObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,8 @@
 		AB8E16C017D63A320071486E /* BLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLE.h; sourceTree = "<group>"; };
 		AB8E16C117D63A320071486E /* BLE.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLE.m; sourceTree = "<group>"; };
 		AB8E16C217D63A320071486E /* BLEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLEDefines.h; sourceTree = "<group>"; };
+		AB8E16C417D645E50071486E /* NSObject+PWObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PWObject.h"; sourceTree = "<group>"; };
+		AB8E16C517D645E50071486E /* NSObject+NSObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+NSObject.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +127,8 @@
 				AB8E16A017D639160071486E /* ViewController.m */,
 				AB8E16A217D639160071486E /* Images.xcassets */,
 				AB8E169117D639160071486E /* Supporting Files */,
+				AB8E16C417D645E50071486E /* NSObject+PWObject.h */,
+				AB8E16C517D645E50071486E /* NSObject+NSObject.m */,
 			);
 			path = Bluebar;
 			sourceTree = "<group>";
@@ -270,6 +275,7 @@
 				AB8E16A117D639160071486E /* ViewController.m in Sources */,
 				AB8E169B17D639160071486E /* AppDelegate.m in Sources */,
 				AB8E169717D639160071486E /* main.m in Sources */,
+				AB8E16C617D645E50071486E /* NSObject+NSObject.m in Sources */,
 				AB8E16C317D63A320071486E /* BLE.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

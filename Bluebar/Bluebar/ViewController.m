@@ -8,11 +8,19 @@
 
 #import "ViewController.h"
 #import "BLE.h"
+#import "NSObject+PWObject.h"
+
+#define DIGITAL_OUTPUT_PIN 4
+#define PWM_PIN 6
+
+#define HIGH 1
+#define LOW 0
 
 @interface ViewController () <BLEDelegate>
 @property (strong, nonatomic) BLE *manager;
 - (void)scanForPeripherals;
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin;
+- (UInt8)addressForPin:(int)pin;
 @end
 
 @implementation ViewController
@@ -21,6 +29,13 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    // Setup the BLE Manager
+    self.manager = [[BLE alloc] init];
+    [self.manager controlSetup:1];
+    self.manager.delegate = self;
+    
+    [self performSelector:@selector(scanForPeripherals) withObject:nil afterDelay:0];
 }
 
 - (void)didReceiveMemoryWarning
@@ -33,6 +48,12 @@
 
 - (void)scanForPeripherals {
     
+    if (self.manager.CM.state != CBCentralManagerStatePoweredOn) {
+        
+        NSLog(@"Bluetooth not yet powered on - so scanning is pointless");
+        return;
+    }
+    
     if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
         
         // Already connected - so disconnect
@@ -44,14 +65,47 @@
     // Search for peripherals with a timeout of 2 seconds
     int timeout = 2;
     [self.manager findBLEPeripherals:timeout];
+    
+    // This will fetch the results after the timeout
+    [self performBlock:^{
+        
+        if (self.manager.peripherals.count > 0) [self.manager connectPeripheral:self.manager.peripherals[0]];
+        
+    } afterDelay:timeout];
+
+}
+
+- (UInt8)addressForPin:(int)pin {
+    
+    switch (pin) {
+        case DIGITAL_OUTPUT_PIN:
+            return 0x01;
+            break;
+        case PWM_PIN:
+            return 0x02;
+            break;
+        default:
+            return 0x00;
+            break;
+    }
 }
 
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin {
     
-    // Add support for sperate pins
-    
-    UInt8 buffer[3] = {0x01, 0x00, 0x00};
+    UInt8 buffer[3] = {0x00, 0x00, 0x00};
+    buffer[0] = [self addressForPin:pin];
     buffer[1] = output ? 0x01 : 0x00;
+    
+    NSData *data = [[NSData alloc] initWithBytes:buffer length:3];
+    [self.manager write:data];
+}
+
+- (void)setAnalogOutput:(UInt8)output forPin:(int)pin {
+    
+    UInt8 buffer[3] = {0x00, 0x00, 0x00};
+    buffer[0] = [self addressForPin:pin];
+    buffer[1] = output;
+    buffer[2] = (int)output >> 8;
     
     NSData *data = [[NSData alloc] initWithBytes:buffer length:3];
     [self.manager write:data];
@@ -67,40 +121,23 @@
 // When RSSI is changed, this will be called
 - (void)bleDidUpdateRSSI:(NSNumber *)rssi
 {
-    NSLog(@"Signal strength: %@", rssi.stringValue);
+    UInt8 brightness = abs(rssi.intValue)*2;
+    [self setAnalogOutput:brightness forPin:PWM_PIN];
+    
+    NSLog(@"Signal strength: %@ Brightness: %d", rssi.stringValue, brightness);
 }
 
 // When disconnected, this will be called
 - (void)bleDidConnect
 {
     NSLog(@"->Connected");
+    [self setDigitalOutput:HIGH forPin:DIGITAL_OUTPUT_PIN];
 }
 
 // When data is comming, this will be called
 - (void)bleDidReceiveData:(unsigned char *)data length:(int)length
 {
-    NSLog(@"Length: %d", length);
-    
-    // parse data, all commands are in 3-byte
-    for (int i = 0; i < length; i+=3)
-    {
-        NSLog(@"0x%02X, 0x%02X, 0x%02X", data[i], data[i+1], data[i+2]);
-        
-        if (data[i] == 0x0A)
-        {
-//            if (data[i+1] == 0x01)
-//                swDigitalIn.on = true;
-//            else
-//                swDigitalIn.on = false;
-        }
-        else if (data[i] == 0x0B)
-        {
-            UInt16 Value;
-            
-            Value = data[i+2] | data[i+1] << 8;
-//            lblAnalogIn.text = [NSString stringWithFormat:@"%d", Value];
-        }
-    }
+
 }
 
 
