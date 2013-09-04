@@ -72,6 +72,11 @@
     [self performBlock:^{
         
         if (self.manager.peripherals.count > 0) [self.manager connectPeripheral:self.manager.peripherals[0]];
+        else {
+            
+            [_controlSwitch setOn:NO animated:YES];
+            _signalStrength.text = @"Device not found       ";
+        }
         _controlSwitch.enabled = YES;
         
     } afterDelay:timeout];
@@ -172,6 +177,16 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
     if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
+        
+//        for (UITouch *touch in [touches allObjects]) {
+//            
+//            float y = [touch locationInView:self.view].y;
+//            float screenHeight = self.view.bounds.size.height;
+//            float intensity = (y/screenHeight)*255;
+//            UInt8 value = roundf(intensity);
+//            [self setAnalogOutput:value forPin:PWM_PIN];
+//            
+//        }
         
         [self setDigitalOutput:LOW forPin:DIGITAL_OUTPUT_PIN];
     }
