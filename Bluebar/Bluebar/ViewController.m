@@ -10,17 +10,23 @@
 #import "BLE.h"
 #import "NSObject+PWObject.h"
 
-#define DIGITAL_OUTPUT_PIN 4
-#define PWM_PIN 6
+#define LEFT_VIBRATOR_PIN 4
+#define RIGHT_VIBRATOR_PIN 5
 
 #define HIGH 1
 #define LOW 0
+
+typedef enum {
+    LeftVibrator,
+    RightVibrator
+} vibrator;
 
 @interface ViewController () <BLEDelegate>
 @property (strong, nonatomic) BLE *manager;
 - (void)scanForPeripherals;
 - (void)setDigitalOutput:(BOOL)output forPin:(int)pin;
 - (UInt8)addressForPin:(int)pin;
+- (int)pinForVibrator:(vibrator)vibrator;
 - (BOOL)pinSupportsAnalogOutput:(int)pin;
 - (void)disconnectCurrentDevice;
 - (void)controlSwitchValueChanged:(id)sender;
@@ -92,13 +98,27 @@
     }
 }
 
+- (int)pinForVibrator:(vibrator)vibrator {
+    
+    switch (vibrator) {
+        case LeftVibrator:
+            return LEFT_VIBRATOR_PIN;
+            break;
+        case RightVibrator:
+            return RIGHT_VIBRATOR_PIN;
+            break;
+        default:
+            break;
+    }
+}
+
 - (UInt8)addressForPin:(int)pin {
     
     switch (pin) {
-        case DIGITAL_OUTPUT_PIN:
+        case LEFT_VIBRATOR_PIN:
             return 0x01;
             break;
-        case PWM_PIN:
+        case RIGHT_VIBRATOR_PIN:
             return 0x02;
             break;
         default:
@@ -110,12 +130,6 @@
 - (BOOL)pinSupportsAnalogOutput:(int)pin {
     
     switch (pin) {
-        case DIGITAL_OUTPUT_PIN:
-            return NO;
-            break;
-        case PWM_PIN:
-            return YES;
-            break;
         default:
             return NO;
             break;
@@ -169,7 +183,7 @@
 
 - (void)blink:(NSNumber *)value {
     
-    [self setDigitalOutput:value.integerValue forPin:DIGITAL_OUTPUT_PIN];
+    [self setDigitalOutput:value.integerValue forPin:LEFT_VIBRATOR_PIN];
     BOOL inverse = !(BOOL)value.integerValue;
     [self performSelector:@selector(blink:) withObject:[NSNumber numberWithBool:inverse] afterDelay:1];
 }
@@ -178,17 +192,34 @@
     
     if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
         
-//        for (UITouch *touch in [touches allObjects]) {
-//            
-//            float y = [touch locationInView:self.view].y;
-//            float screenHeight = self.view.bounds.size.height;
-//            float intensity = (y/screenHeight)*255;
-//            UInt8 value = roundf(intensity);
-//            [self setAnalogOutput:value forPin:PWM_PIN];
-//            
-//        }
+        for (UITouch *touch in [touches allObjects]) {
+            
+            float x = [touch locationInView:self.view].x;
+            float screenWidth = self.view.bounds.size.width;
+            
+            float middleMax = screenWidth/2 + screenWidth/8;
+            float middleMin = screenWidth/2 - screenWidth/8;
+            
+            if (x < middleMax && x > middleMin) {
+                
+                [self setDigitalOutput:LOW forPin:LEFT_VIBRATOR_PIN];
+                [self setDigitalOutput:LOW forPin:RIGHT_VIBRATOR_PIN];
+            }
+            
+            else if (x<middleMin) {
+                
+                // It is a left press
+                [self setDigitalOutput:LOW forPin:LEFT_VIBRATOR_PIN];
+            }
+            
+            else if (x>middleMax) {
+                
+                // It is a right press
+                [self setDigitalOutput:LOW forPin:RIGHT_VIBRATOR_PIN];
+            }
+            
+        }
         
-        [self setDigitalOutput:LOW forPin:DIGITAL_OUTPUT_PIN];
     }
 }
 
@@ -197,7 +228,8 @@
     if (self.manager.activePeripheral && self.manager.activePeripheral.isConnected) {
         
         // Already connected - so disconnect
-        [self setDigitalOutput:HIGH forPin:DIGITAL_OUTPUT_PIN];
+        [self setDigitalOutput:HIGH forPin:LEFT_VIBRATOR_PIN];
+        [self setDigitalOutput:HIGH forPin:RIGHT_VIBRATOR_PIN];
     }
 }
 
@@ -213,9 +245,6 @@
 // When RSSI is changed, this will be called
 - (void)bleDidUpdateRSSI:(NSNumber *)rssi
 {
-    UInt8 brightness = abs(rssi.intValue)*2;
-    [self setAnalogOutput:brightness forPin:PWM_PIN];
-    
     _signalStrength.text = [NSString stringWithFormat:@"Signal strength: %@", rssi.stringValue];
 }
 
