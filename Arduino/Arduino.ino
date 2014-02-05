@@ -2,8 +2,8 @@
 #include <ble.h>
 #include <Servo.h> 
  
-#define DIGITAL_OUT_PIN    4
-#define PWM_PIN            6
+#define LEFT_VIBRATOR_PIN    4
+#define RIGHT_VIBRATOR_PIN   5
 
 void setup()
 {
@@ -14,7 +14,8 @@ void setup()
 
   ble_begin();
   
-  pinMode(DIGITAL_OUT_PIN, OUTPUT);  
+  pinMode(LEFT_VIBRATOR_PIN, OUTPUT);
+  pinMode(RIGHT_VIBRATOR_PIN, OUTPUT);    
 }
 
 void loop()
@@ -27,25 +28,28 @@ void loop()
     byte data1 = ble_read();
     byte data2 = ble_read();
     
-    if (data0 == 0x01)  // Command is to control digital out pin
+    if (data0 == 0x01)  // Command is to control the left vibrator
     {
       if (data1 == 0x01)
-        digitalWrite(DIGITAL_OUT_PIN, HIGH);
+        digitalWrite(LEFT_VIBRATOR_PIN, HIGH);
       else
-        digitalWrite(DIGITAL_OUT_PIN, LOW);
+        digitalWrite(LEFT_VIBRATOR_PIN, LOW);
     }
-    else if (data0 == 0x02) // Command is to control PWM pin
+    
+    if (data0 == 0x02)  // Command is to control the right vibrator
     {
-      analogWrite(PWM_PIN, data1);
+      if (data1 == 0x01)
+        digitalWrite(RIGHT_VIBRATOR_PIN, HIGH);
+      else
+        digitalWrite(RIGHT_VIBRATOR_PIN, LOW);
     }
 
   }
-
   
   if (!ble_connected())
   {
-    digitalWrite(DIGITAL_OUT_PIN, HIGH);
-    digitalWrite(PWM_PIN, LOW);
+    digitalWrite(LEFT_VIBRATOR_PIN, HIGH);
+    digitalWrite(RIGHT_VIBRATOR_PIN, HIGH);
   }
   
   // Allow BLE Shield to send/receive data
